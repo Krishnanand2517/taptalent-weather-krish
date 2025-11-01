@@ -2,6 +2,7 @@ import { IconDroplets, IconLeaf, IconClock } from "@tabler/icons-react";
 
 import type { CityData } from "../types";
 import WeatherIcon from "./WeatherIcon";
+import { getAqiColor, getCardBg } from "../utils/colors";
 
 interface WeatherCardProps {
   cityData: CityData;
@@ -10,35 +11,10 @@ interface WeatherCardProps {
 const WeatherCard = ({ cityData }: WeatherCardProps) => {
   const { city, temperature, condition, humidity, aqi, lastUpdated } = cityData;
 
-  // AQI color logic
-  const getAqiColor = () => {
-    if (aqi <= 50) return "text-green-600";
-    if (aqi <= 100) return "text-yellow-600";
-    if (aqi <= 150) return "text-orange-600";
-    return "text-red-600";
-  };
-
-  // Card background color based on weather
-  const getCardBg = () => {
-    switch (condition) {
-      case "sunny":
-        return "from-yellow-100 to-white";
-      case "rainy":
-        return "from-blue-100 to-white";
-      case "snowy":
-        return "from-blue-50 to-white";
-      case "cloudy":
-      case "partly-cloudy":
-        return "from-gray-100 to-white";
-      default:
-        return "bg-white";
-    }
-  };
-
   return (
     <div
-      className={`bg-linear-to-br ${getCardBg()}
-                 p-6 rounded-2xl shadow-lg 
+      className={`bg-linear-to-br ${getCardBg(condition)}
+                 p-6 md:px-12 rounded-2xl shadow-lg 
                  transition-all duration-300 ease-in-out
                  hover:shadow-xl hover:-translate-y-1`}
     >
@@ -49,7 +25,7 @@ const WeatherCard = ({ cityData }: WeatherCardProps) => {
             <WeatherIcon condition={condition} className="w-16 h-16" />
             <h2 className="text-2xl font-bold text-gray-800 mt-2">{city}</h2>
             <div
-              className={`flex items-center space-x-1 ${getAqiColor()} mt-1`}
+              className={`flex items-center space-x-1 ${getAqiColor(aqi)} mt-1`}
             >
               <IconLeaf className="w-4 h-4" />
               <span className="text-sm font-medium">AQI {aqi}</span>
@@ -58,7 +34,7 @@ const WeatherCard = ({ cityData }: WeatherCardProps) => {
           <div className="mt-4">
             <div className="flex items-center space-x-1 text-gray-500">
               <IconClock className="w-4 h-4" />
-              <span className="text-sm">Updated {lastUpdated}</span>
+              <span className="text-sm">{lastUpdated}</span>
             </div>
           </div>
         </div>
@@ -73,7 +49,7 @@ const WeatherCard = ({ cityData }: WeatherCardProps) => {
               </span>
             </h1>
           </div>
-          <div className="flex items-center space-x-2 text-gray-600 mt-4">
+          <div className="flex items-center space-x-1 text-gray-600 mt-4">
             <IconDroplets className="w-6 h-6 text-blue-400" />
             <div>
               <p className="text-sm text-gray-500">Humidity</p>
