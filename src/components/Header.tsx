@@ -12,7 +12,7 @@ const Header = () => {
     location.pathname === "/"
       ? "Dashboard"
       : cityId
-      ? mockWeatherData.find((city) => city.id === cityId)?.city
+      ? mockWeatherData.find((city) => city.id === cityId)?.name
       : "Detailed View";
 
   return (
