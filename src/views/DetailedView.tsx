@@ -17,6 +17,7 @@ import {
 import { useWeatherContext } from "../hooks/useWeatherContext";
 import { getRelativeTime } from "../utils/relativeTime";
 import WeatherIcon from "../components/WeatherIcon";
+import { mockWeatherDataDetailed } from "../data/mockData";
 
 const DetailedView = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const DetailedView = () => {
     wind,
     sys,
     dt,
+    coord: { lat, lon },
   } = currentCity;
 
   const condition = weather[0].main ?? "Unknown";
@@ -86,6 +88,10 @@ const DetailedView = () => {
       iconClass: "text-orange-600",
     },
   ];
+
+  const cityDetails = mockWeatherDataDetailed.find(
+    (city) => city.lon === lon && city.lat === lat
+  );
 
   return (
     <div>
