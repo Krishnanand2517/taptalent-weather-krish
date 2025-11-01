@@ -1,0 +1,58 @@
+import type { CityData } from "../types";
+
+export const mockWeatherData: CityData[] = [
+  {
+    id: 1,
+    city: "Bengaluru",
+    temperature: 29,
+    condition: "partly-cloudy",
+    humidity: 87,
+    aqi: 76,
+    lastUpdated: "46m ago",
+  },
+  {
+    id: 2,
+    city: "Hyderabad",
+    temperature: 34,
+    condition: "sunny",
+    humidity: 18,
+    aqi: 145,
+    lastUpdated: "12h ago",
+  },
+  {
+    id: 3,
+    city: "New York",
+    temperature: 18,
+    condition: "sunny",
+    humidity: 65,
+    aqi: 42,
+    lastUpdated: "5m ago",
+  },
+  {
+    id: 4,
+    city: "London",
+    temperature: 12,
+    condition: "rainy",
+    humidity: 85,
+    aqi: 58,
+    lastUpdated: "1h ago",
+  },
+  {
+    id: 5,
+    city: "Tokyo",
+    temperature: 22,
+    condition: "partly-cloudy",
+    humidity: 70,
+    aqi: 90,
+    lastUpdated: "15m ago",
+  },
+  {
+    id: 6,
+    city: "Moscow",
+    temperature: -5,
+    condition: "snowy",
+    humidity: 90,
+    aqi: 30,
+    lastUpdated: "30m ago",
+  },
+];
