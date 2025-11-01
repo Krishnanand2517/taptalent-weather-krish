@@ -1,8 +1,6 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import { IconSearch } from "@tabler/icons-react";
-
-import { mockWeatherData } from "./data/mockData";
-import WeatherCard from "./components/WeatherCard";
 
 const App = () => {
   const [unit, setUnit] = useState("C");
@@ -58,13 +56,8 @@ const App = () => {
           </div>
         </header>
 
-        {/* Dashboard Grid */}
         <main>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockWeatherData.map((city) => (
-              <WeatherCard key={city.id} cityData={city} />
-            ))}
-          </div>
+          <Outlet />
         </main>
       </div>
     </div>
