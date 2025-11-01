@@ -31,7 +31,7 @@ const App = () => {
         <Header pageName={pageName} />
 
         <main>
-          <Outlet />
+          <Outlet context={{ weatherData: mockWeatherData }} />
         </main>
       </div>
     </div>
