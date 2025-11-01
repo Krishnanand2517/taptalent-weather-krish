@@ -19,7 +19,7 @@ const WeatherCard = ({ cityData }: WeatherCardProps) => {
     dt,
   } = cityData;
 
-  const condition = weather[0]?.main ?? "Unknown";
+  const condition = weather[0].main ?? "Unknown";
   const icon = weather[0].icon ?? "";
   const temperature = Math.round(temp - 273.15);
   const lastUpdated = getRelativeTime(dt);
@@ -32,8 +32,8 @@ const WeatherCard = ({ cityData }: WeatherCardProps) => {
       onClick={() => navigate(`/city-${id}`)}
       className={`bg-linear-to-br ${getCardBg(condition, isNight)}
                  p-6 md:px-12 rounded-2xl shadow-lg 
-                 transition-all duration-300 ease-in-out
-                 hover:cursor-pointer hover:shadow-xl hover:-translate-y-1
+                 transition-all duration-300 ease-in-out cursor-pointer
+                 hover:shadow-xl hover:-translate-y-1
                  ${isNight ? "text-gray-100" : "text-gray-800"}`}
     >
       <div className="flex justify-between space-x-4">

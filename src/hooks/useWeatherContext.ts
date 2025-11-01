@@ -4,6 +4,7 @@ import type { CityData } from "../types";
 
 type WeatherContextType = {
   weatherData: CityData[];
+  currentCity: CityData;
 };
 
 export const useWeatherContext = () => {
