@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import App from "./App.tsx";
 import DashboardView from "./views/DashboardView.tsx";
+import DetailedView from "./views/DetailedView.tsx";
 
 const router = createBrowserRouter([
   {
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <DashboardView />,
+      },
+      {
+        path: "/:cityId",
+        element: <DetailedView />,
       },
     ],
   },

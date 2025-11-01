@@ -3,20 +3,25 @@ import { IconDroplets, IconLeaf, IconClock } from "@tabler/icons-react";
 import type { CityData } from "../types";
 import WeatherIcon from "./WeatherIcon";
 import { getAqiColor, getCardBg } from "../utils/colors";
+import { useNavigate } from "react-router-dom";
 
 interface WeatherCardProps {
   cityData: CityData;
 }
 
 const WeatherCard = ({ cityData }: WeatherCardProps) => {
-  const { city, temperature, condition, humidity, aqi, lastUpdated } = cityData;
+  const { id, city, temperature, condition, humidity, aqi, lastUpdated } =
+    cityData;
+
+  const navigate = useNavigate();
 
   return (
     <div
+      onClick={() => navigate(`/city-${id}`)}
       className={`bg-linear-to-br ${getCardBg(condition)}
                  p-6 md:px-12 rounded-2xl shadow-lg 
                  transition-all duration-300 ease-in-out
-                 hover:shadow-xl hover:-translate-y-1`}
+                 hover:cursor-pointer hover:shadow-xl hover:-translate-y-1`}
     >
       <div className="flex justify-between space-x-4">
         {/* Left Column: Icon, City, AQI, Status */}

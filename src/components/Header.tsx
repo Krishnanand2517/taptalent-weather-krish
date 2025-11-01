@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { IconSearch } from "@tabler/icons-react";
 import { useLocation } from "react-router-dom";
+import { mockWeatherData } from "../data/mockData";
 
 const Header = () => {
   const [unit, setUnit] = useState("C");
 
   const location = useLocation();
-  const pageName = location.pathname === "/" ? "Dashboard" : "Detailed View";
+  const cityId = Number(location.pathname.slice(6));
+  const pageName =
+    location.pathname === "/"
+      ? "Dashboard"
+      : cityId
+      ? mockWeatherData.find((city) => city.id === cityId)?.city
+      : "Detailed View";
 
   return (
     <header className="flex flex-col sm:flex-row justify-between items-center mb-10 space-y-4 sm:space-y-0">
