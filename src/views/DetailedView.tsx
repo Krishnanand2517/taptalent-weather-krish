@@ -6,6 +6,7 @@ import {
   IconCloudRain,
   IconPin,
   IconTemperature,
+  IconTemperatureSnow,
   IconTrendingUp,
   IconWind,
 } from "@tabler/icons-react";
@@ -28,6 +29,7 @@ import DailyChart from "../components/DailyChart";
 import WindChart from "../components/WindChart";
 import { getWindDirection } from "../utils/windDirection";
 import WindCompass from "../components/WindCompass";
+import DailyPrediction from "../components/DailyPrediction";
 
 const DetailedView = () => {
   const [isPinned, setIsPinned] = useState(false);
@@ -207,10 +209,31 @@ const DetailedView = () => {
           <div className="bg-amber-800/10 dark:bg-amber-200/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-6 shadow-2xl">
             <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
               <IconTrendingUp className="w-6 h-6" />
-              7-Day Temperature Trend
+              Daily Temperature
             </h2>
             <div className="h-64">
               <DailyChart dailyTempData={dailyTempData} />
+            </div>
+          </div>
+
+          {/* 7-Day Prediction */}
+          <div className="bg-blue-800/10 dark:bg-blue-200/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-6 shadow-2xl">
+            <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
+              <IconTemperatureSnow className="w-6 h-6" />
+              7-Day Forecast
+            </h2>
+
+            <div className="space-y-3 md:p-6">
+              {daily?.map((day, idx) => {
+                return (
+                  <div
+                    key={idx}
+                    className="bg-neutral-900/10 dark:bg-white/10 backdrop-blur-sm border border-neutral-900/20 dark:border-white/20 rounded-xl p-4 hover:bg-neutral-900/20 dark:hover:bg-white/20 transition-all duration-300"
+                  >
+                    <DailyPrediction day={day} idx={idx} />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
