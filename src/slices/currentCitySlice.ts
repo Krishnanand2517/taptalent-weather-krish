@@ -5,8 +5,10 @@ interface CurrentCityState {
   city: CityData | null;
 }
 
+const persistedCity = localStorage.getItem("currentCity");
+
 const initialState: CurrentCityState = {
-  city: null,
+  city: persistedCity ? JSON.parse(persistedCity) : null,
 };
 
 const currentCitySlice = createSlice({
@@ -15,6 +17,11 @@ const currentCitySlice = createSlice({
   reducers: {
     setCurrentCity(state, action: PayloadAction<CityData | null>) {
       state.city = action.payload;
+      if (action.payload) {
+        localStorage.setItem("currentCity", JSON.stringify(action.payload));
+      } else {
+        localStorage.removeItem("currentCity");
+      }
     },
   },
 });
