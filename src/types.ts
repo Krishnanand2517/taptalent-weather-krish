@@ -1,3 +1,13 @@
+export interface FavoriteCity {
+  id: number;
+  name: string;
+  country: string;
+  lat: number;
+  lon: number;
+}
+
+export type TemperatureUnit = "celsius" | "fahrenheit";
+
 // ------ OneCall 3.0 API --------
 export type WeatherCondition = {
   id: number;
