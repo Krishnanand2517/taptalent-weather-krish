@@ -12,7 +12,6 @@ const App = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
 
-  // const currentWeather = useAppSelector(selectCurrentWeather);
   const favoriteCities = useAppSelector(selectFavoriteCities);
   const currentCity = useAppSelector((state) => state.currentCity.city);
 
