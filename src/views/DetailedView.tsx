@@ -194,63 +194,67 @@ const DetailedView = () => {
         <AlertBox alerts={alerts} />
 
         {/* Current Weather - Hero Card */}
-        <div
-          className={`${getCardBg(
-            condition,
-            isNight
-          )}/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-8 shadow-2xl`}
-        >
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <IconCloud className="w-20 h-20 text-neutral-800 dark:text-white" />
-                <div>
-                  <div className="text-7xl font-bold text-neutral-800 dark:text-white">
-                    {temperature.value}°
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-neutral-300 dark:border-white/20">
+          <div
+            className={`absolute inset-0 bg-linear-to-br ${getCardBg(
+              condition,
+              isNight
+            )} opacity-20`}
+          ></div>
+
+          <div className="relative backdrop-blur-xl p-8 transition-all duration-500 text-gray-900 dark:text-gray-100">
+            <div className="grid lg:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <IconCloud className="w-20 h-20 text-neutral-800 dark:text-white" />
+                  <div>
+                    <div className="text-7xl font-bold text-neutral-800 dark:text-white">
+                      {temperature.value}°
+                    </div>
+                    <p className="text-2xl text-gray-700 dark:text-blue-100 capitalize mt-2">
+                      {current.weather[0].description}
+                    </p>
                   </div>
-                  <p className="text-2xl text-gray-700 dark:text-blue-100 capitalize mt-2">
-                    {current.weather[0].description}
-                  </p>
                 </div>
-              </div>
-              <div className="text-neutral-900 dark:text-white/80 text-lg">
-                Feels like {feelsLike.formatted}
+                <div className="text-neutral-900 dark:text-white/80 text-lg">
+                  Feels like {feelsLike.formatted}
+                </div>
+
+                <button
+                  onClick={handleTogglePin}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-300 ${
+                    isPinned
+                      ? "bg-yellow-400 text-gray-900 hover:bg-yellow-300 shadow-lg shadow-yellow-400/50"
+                      : "bg-neutral-900/20 text-neutral-800 hover:bg-neutral-900/30 dark:bg-white/20 dark:text-white dark:hover:bg-white/30 backdrop-blur-sm border border-white/30"
+                  }`}
+                >
+                  <IconPin
+                    className={`w-5 h-5 transition-transform duration-300 ${
+                      isPinned ? "-rotate-45" : ""
+                    }`}
+                  />
+                  {isPinned ? "Pinned" : "Pin to Dashboard"}
+                </button>
               </div>
 
-              <button
-                onClick={handleTogglePin}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-300 ${
-                  isPinned
-                    ? "bg-yellow-400 text-gray-900 hover:bg-yellow-300 shadow-lg shadow-yellow-400/50"
-                    : "bg-neutral-900/20 text-neutral-800 hover:bg-neutral-900/30 dark:bg-white/20 dark:text-white dark:hover:bg-white/30 backdrop-blur-sm border border-white/30"
-                }`}
-              >
-                <IconPin
-                  className={`w-5 h-5 transition-transform duration-300 ${
-                    isPinned ? "-rotate-45" : ""
-                  }`}
-                />
-                {isPinned ? "Pinned" : "Pin to Dashboard"}
-              </button>
+              <DetailsGrid
+                wind_speed={current.wind_speed}
+                wind_deg={current.wind_deg}
+                humidity={current.humidity}
+                visibility={current.visibility}
+                pressure={current.pressure}
+                dewPoint={dewPoint.value}
+                uvi={current.uvi}
+                unit={unit}
+              />
             </div>
 
-            <DetailsGrid
-              wind_speed={current.wind_speed}
-              wind_deg={current.wind_deg}
-              humidity={current.humidity}
-              visibility={current.visibility}
-              pressure={current.pressure}
-              dewPoint={dewPoint.value}
-              uvi={current.uvi}
-              unit={unit}
+            <SunTimings
+              sunrise={current.sunrise}
+              sunset={current.sunset}
+              lastUpdated={lastUpdated}
             />
           </div>
-
-          <SunTimings
-            sunrise={current.sunrise}
-            sunset={current.sunset}
-            lastUpdated={lastUpdated}
-          />
         </div>
 
         <div className="space-y-12">
