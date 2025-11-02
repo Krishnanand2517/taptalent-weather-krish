@@ -125,6 +125,7 @@ export type CityLocation = {
   lat: number;
   lon: number;
   country: string;
+  state?: string;
 };
 
 // ------ Current Weather API ----------
