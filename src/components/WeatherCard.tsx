@@ -1,19 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { IconDroplets, IconClock } from "@tabler/icons-react";
 
-import type { CityData } from "../types";
+import type { CityData, TemperatureUnit } from "../types";
 import WeatherIcon from "./WeatherIcon";
 import { getCardBg } from "../utils/colors";
 import { getRelativeTime } from "../utils/timeFormatting";
 import { useAppDispatch } from "../hooks/reduxHooks";
 import { setCurrentCity } from "../slices/currentCitySlice";
+import { getTemperatureDisplay } from "../utils/tempConversion";
 
 interface WeatherCardProps {
   cityData: CityData;
+  unit: TemperatureUnit;
 }
 
-const WeatherCard = ({ cityData }: WeatherCardProps) => {
+const WeatherCard = ({ cityData, unit }: WeatherCardProps) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const {
     name,
@@ -24,11 +27,10 @@ const WeatherCard = ({ cityData }: WeatherCardProps) => {
 
   const condition = weather[0].main ?? "Unknown";
   const icon = weather[0].icon ?? "";
-  const temperature = Math.round(temp - 273.15);
-  const lastUpdated = getRelativeTime(dt);
   const isNight = icon.endsWith("n");
+  const lastUpdated = getRelativeTime(dt);
 
-  const navigate = useNavigate();
+  const { value, symbol } = getTemperatureDisplay(temp, unit);
 
   const handleClick = () => {
     dispatch(setCurrentCity(cityData));
@@ -82,13 +84,13 @@ const WeatherCard = ({ cityData }: WeatherCardProps) => {
                 isNight ? "text-gray-100" : "text-gray-900"
               }`}
             >
-              {temperature}
+              {value}
               <span
                 className={`text-2xl absolute -top-1 -right-6 font-light ${
                   isNight ? "text-gray-300" : "text-gray-500"
                 }`}
               >
-                °C
+                {symbol}
               </span>
             </h1>
           </div>
