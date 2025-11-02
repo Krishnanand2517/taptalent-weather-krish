@@ -2,11 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   IconArrowLeft,
-  IconChartArea,
-  IconChartDots,
-  IconChartLine,
   IconCloud,
+  IconDroplet,
   IconPin,
+  IconTrendingUp,
 } from "@tabler/icons-react";
 
 import { useWeatherContext } from "../hooks/useWeatherContext";
@@ -16,6 +15,8 @@ import { getCardBg } from "../utils/colors";
 import AlertBox from "../components/AlertBox";
 import DetailsGrid from "../components/DetailsGrid";
 import SunTimings from "../components/SunTimings";
+import HourlyChart from "../components/HourlyChart";
+import WeatherIcon from "../components/WeatherIcon";
 
 const DetailedView = () => {
   const [isPinned, setIsPinned] = useState(false);
@@ -45,10 +46,10 @@ const DetailedView = () => {
   const isNight = icon.endsWith("n");
 
   const hourlyChartData =
-    hourly?.slice(0, 24).map((h) => ({
+    hourly?.slice(0, 12).map((h) => ({
       time: formatTime(h.dt),
-      temp: Math.round(h.temp),
-      feelsLike: Math.round(h.feels_like),
+      temp: Math.round(h.temp - 273.15),
+      feelsLike: Math.round(h.feels_like - 273.15),
       pop: Math.round(h.pop * 100),
     })) || [];
 
@@ -126,26 +127,52 @@ const DetailedView = () => {
           />
         </div>
 
-        {/* Placeholder Chart Cards */}
+        {/* Chart Cards */}
         <div className="space-y-12">
+          {/* Hourly Forecast Chart */}
+          <div className="bg-neutral-800/10 dark:bg-white/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-6 shadow-2xl">
+            <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
+              <IconTrendingUp className="w-6 h-6" />
+              12-Hour Forecast
+            </h2>
+            <div className="h-64">
+              <HourlyChart hourlyChartData={hourlyChartData} />
+            </div>
+
+            {/* Horizontal Scroll */}
+            <div className="flex overflow-x-auto space-x-4 mt-2 pb-2 -mb-2">
+              {hourly?.slice(0, 12).map((hour, index) => {
+                const condition = hour.weather[0].main;
+                const isNightHourly = hour.weather[0].icon.endsWith("n");
+                const hourlyTemp = Math.round(hour.temp - 273.15);
+
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center shrink-0 w-24 p-3 bg-gray-100 dark:bg-gray-800/80 rounded-lg"
+                  >
+                    <p className="text-sm font-medium">{formatTime(hour.dt)}</p>
+                    <WeatherIcon
+                      condition={condition}
+                      isNight={isNightHourly}
+                      className="w-10 h-10 my-1"
+                    />
+                    <p className="text-lg font-bold">{hourlyTemp}°</p>
+                    <div className="flex items-center text-xs text-blue-500 dark:text-blue-400 mt-1">
+                      <IconDroplet size={12} className="mr-1" />
+                      <span>{Math.round(hour.pop * 100)}%</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="bg-white dark:bg-neutral-900 shadow-lg rounded-2xl p-6 border border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center h-48">
-            <IconChartArea className="w-12 h-12 text-gray-300 mb-2" />
-            <h3 className="text-lg font-semibold text-gray-700">
-              Temperature Chart
-            </h3>
-            <p className="text-sm text-gray-400">(Placeholder)</p>
+            {/* Precipitation Chart */}
           </div>
           <div className="bg-white dark:bg-neutral-900 shadow-lg rounded-2xl p-6 border border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center h-48">
-            <IconChartLine className="w-12 h-12 text-gray-300 mb-2" />
-            <h3 className="text-lg font-semibold text-gray-700">
-              Precipitation Chart
-            </h3>
-            <p className="text-sm text-gray-400">(Placeholder)</p>
-          </div>
-          <div className="bg-white dark:bg-neutral-900 shadow-lg rounded-2xl p-6 border border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center h-48">
-            <IconChartDots className="w-12 h-12 text-gray-300 mb-2" />
-            <h3 className="text-lg font-semibold text-gray-700">Wind Speed</h3>
-            <p className="text-sm text-gray-400">(Placeholder)</p>
+            {/* Wind Chart */}
           </div>
         </div>
       </div>
