@@ -5,11 +5,16 @@ import {
   IconCloud,
   IconCloudRain,
   IconPin,
+  IconTemperature,
   IconTrendingUp,
 } from "@tabler/icons-react";
 
 import { useWeatherContext } from "../hooks/useWeatherContext";
-import { formatTime, getRelativeTime } from "../utils/timeFormatting";
+import {
+  formatDate,
+  formatTime,
+  getRelativeTime,
+} from "../utils/timeFormatting";
 import { mockWeatherDataDetailed } from "../data/mockData";
 import { getCardBg } from "../utils/colors";
 import AlertBox from "../components/AlertBox";
@@ -18,6 +23,7 @@ import SunTimings from "../components/SunTimings";
 import HourlyChart from "../components/HourlyChart";
 import HourlyScroll from "../components/HourlyScroll";
 import RainChart from "../components/RainChart";
+import DailyChart from "../components/DailyChart";
 
 const DetailedView = () => {
   const [isPinned, setIsPinned] = useState(false);
@@ -36,7 +42,7 @@ const DetailedView = () => {
       (city) => city.lon === lon && city.lat === lat
     ) ?? mockWeatherDataDetailed[0];
 
-  const { current, hourly, alerts } = cityDetails;
+  const { current, hourly, daily, alerts } = cityDetails;
 
   const condition = weather[0].main ?? "Unknown";
   const icon = weather[0].icon ?? "";
@@ -52,6 +58,14 @@ const DetailedView = () => {
       temp: Math.round(h.temp - 273.15),
       feelsLike: Math.round(h.feels_like - 273.15),
       pop: Math.round(h.pop * 100),
+    })) || [];
+
+  const dailyTempData =
+    daily?.map((day) => ({
+      date: formatDate(day.dt),
+      max: Math.round(day.temp.max - 273.15),
+      min: Math.round(day.temp.min - 273.15),
+      avg: Math.round((day.temp.max + day.temp.min) / 2 - 273.15),
     })) || [];
 
   return (
@@ -133,7 +147,7 @@ const DetailedView = () => {
           {/* Hourly Forecast Chart */}
           <div className="bg-neutral-800/10 dark:bg-white/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-6 shadow-2xl">
             <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
-              <IconTrendingUp className="w-6 h-6" />
+              <IconTemperature className="w-6 h-6" />
               12-Hour Forecast
             </h2>
             <div className="h-64">
@@ -152,6 +166,18 @@ const DetailedView = () => {
               <RainChart hourlyChartData={hourlyChartData} />
             </div>
           </div>
+
+          {/* Daily Temperature Chart */}
+          <div className="bg-amber-800/10 dark:bg-amber-200/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-6 shadow-2xl">
+            <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
+              <IconTrendingUp className="w-6 h-6" />
+              7-Day Temperature Trend
+            </h2>
+            <div className="h-64">
+              <DailyChart dailyTempData={dailyTempData} />
+            </div>
+          </div>
+
           <div className="bg-neutral-800/10 dark:bg-white/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-6 shadow-2xl">
             {/* Wind Chart */}
           </div>
