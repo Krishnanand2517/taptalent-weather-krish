@@ -7,6 +7,7 @@ import {
   IconPin,
   IconTemperature,
   IconTrendingUp,
+  IconWind,
 } from "@tabler/icons-react";
 
 import { useWeatherContext } from "../hooks/useWeatherContext";
@@ -24,6 +25,9 @@ import HourlyChart from "../components/HourlyChart";
 import HourlyScroll from "../components/HourlyScroll";
 import RainChart from "../components/RainChart";
 import DailyChart from "../components/DailyChart";
+import WindChart from "../components/WindChart";
+import { getWindDirection } from "../utils/windDirection";
+import WindCompass from "../components/WindCompass";
 
 const DetailedView = () => {
   const [isPinned, setIsPinned] = useState(false);
@@ -66,6 +70,14 @@ const DetailedView = () => {
       max: Math.round(day.temp.max - 273.15),
       min: Math.round(day.temp.min - 273.15),
       avg: Math.round((day.temp.max + day.temp.min) / 2 - 273.15),
+    })) || [];
+
+  const windData =
+    hourly?.slice(0, 12).map((h) => ({
+      time: formatTime(h.dt),
+      speed: h.wind_speed,
+      direction: getWindDirection(h.wind_deg),
+      deg: h.wind_deg,
     })) || [];
 
   return (
@@ -142,7 +154,6 @@ const DetailedView = () => {
           />
         </div>
 
-        {/* Chart Cards */}
         <div className="space-y-12">
           {/* Hourly Forecast Chart */}
           <div className="bg-neutral-800/10 dark:bg-white/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-6 shadow-2xl">
@@ -167,6 +178,31 @@ const DetailedView = () => {
             </div>
           </div>
 
+          {/* Wind Chart */}
+          <div className="bg-neutral-800/10 dark:bg-white/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-6 shadow-2xl">
+            <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
+              <IconWind className="w-6 h-6" />
+              Wind Speed & Direction
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <WindCompass
+                wind_deg={current.wind_deg}
+                wind_speed={current.wind_speed}
+                wind_gust={current.wind_gust}
+              />
+
+              {/* 12-hour wind speed chart */}
+              <div className="flex flex-col">
+                <h3 className="text-neutral-900 dark:text-white text-lg font-semibold mb-3">
+                  12-Hour Wind Speed
+                </h3>
+                <div className="flex-1" style={{ minHeight: "280px" }}>
+                  <WindChart windData={windData} />
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Daily Temperature Chart */}
           <div className="bg-amber-800/10 dark:bg-amber-200/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-6 shadow-2xl">
             <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
@@ -176,10 +212,6 @@ const DetailedView = () => {
             <div className="h-64">
               <DailyChart dailyTempData={dailyTempData} />
             </div>
-          </div>
-
-          <div className="bg-neutral-800/10 dark:bg-white/10 backdrop-blur-xl border border-neutral-300 dark:border-white/20 rounded-3xl p-6 shadow-2xl">
-            {/* Wind Chart */}
           </div>
         </div>
       </div>
