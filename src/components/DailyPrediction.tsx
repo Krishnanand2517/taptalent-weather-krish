@@ -1,16 +1,23 @@
 import { IconDroplets } from "@tabler/icons-react";
 import type { DailyData } from "../types";
+import type { TemperatureUnit } from "../types";
 import { formatDate } from "../utils/timeFormatting";
+import { getTemperatureDisplay } from "../utils/tempConversion";
 import WeatherIcon from "./WeatherIcon";
 
 interface DailyPredictionProps {
   day: DailyData;
   idx: number;
+  unit: TemperatureUnit;
 }
 
-const DailyPrediction = ({ day, idx }: DailyPredictionProps) => {
+const DailyPrediction = ({ day, idx, unit }: DailyPredictionProps) => {
   const conditionToday = day.weather[0].main;
   const isNightToday = day.weather[0].icon.endsWith("n");
+
+  // Convert temperatures based on unit
+  const maxTemp = getTemperatureDisplay(day.temp.max, unit);
+  const minTemp = getTemperatureDisplay(day.temp.min, unit);
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 items-center space-x-4 space-y-2">
@@ -31,10 +38,10 @@ const DailyPrediction = ({ day, idx }: DailyPredictionProps) => {
 
       <div className="text-right">
         <span className="text-lg font-bold text-neutral-900 dark:text-white">
-          {Math.round(day.temp.max - 273.15)}°
+          {maxTemp.value}°
         </span>
         <span className="ml-2 text-blue-700 dark:text-blue-200">
-          {Math.round(day.temp.min - 273.15)}°
+          {minTemp.value}°
         </span>
       </div>
 

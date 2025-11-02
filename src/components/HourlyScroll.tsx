@@ -2,19 +2,22 @@ import { IconDroplet } from "@tabler/icons-react";
 
 import WeatherIcon from "./WeatherIcon";
 import { formatTime } from "../utils/timeFormatting";
+import { getTemperatureDisplay } from "../utils/tempConversion";
 import type { HourlyData } from "../types";
+import type { TemperatureUnit } from "../types";
 
 interface HourlyScrollProps {
   hourly: HourlyData[] | undefined;
+  unit: TemperatureUnit;
 }
 
-const HourlyScroll = ({ hourly }: HourlyScrollProps) => {
+const HourlyScroll = ({ hourly, unit }: HourlyScrollProps) => {
   return (
     <div className="flex overflow-x-auto space-x-4 mt-2 pb-2 -mb-2">
       {hourly?.slice(0, 12).map((hour, index) => {
         const condition = hour.weather[0].main;
         const isNightHourly = hour.weather[0].icon.endsWith("n");
-        const hourlyTemp = Math.round(hour.temp - 273.15);
+        const hourlyTemp = getTemperatureDisplay(hour.temp, unit);
 
         return (
           <div
@@ -27,7 +30,7 @@ const HourlyScroll = ({ hourly }: HourlyScrollProps) => {
               isNight={isNightHourly}
               className="w-10 h-10 my-1"
             />
-            <p className="text-lg font-bold">{hourlyTemp}°</p>
+            <p className="text-lg font-bold">{hourlyTemp.value}°</p>
             <div className="flex items-center text-xs text-blue-500 dark:text-blue-400 mt-1">
               <IconDroplet size={12} className="mr-1" />
               <span>{Math.round(hour.pop * 100)}%</span>

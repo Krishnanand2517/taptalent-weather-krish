@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Area,
   AreaChart,
@@ -8,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type { TemperatureUnit } from "../types";
 
 interface DailyChartProps {
   dailyTempData: {
@@ -16,9 +18,47 @@ interface DailyChartProps {
     min: number;
     avg: number;
   }[];
+  unit: TemperatureUnit;
 }
 
-const DailyChart = ({ dailyTempData }: DailyChartProps) => {
+const DailyChart = ({ dailyTempData, unit }: DailyChartProps) => {
+  const unitSymbol = unit === "celsius" ? "°C" : "°F";
+
+  // Custom tooltip to format temperatures
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div
+          style={{
+            backgroundColor: "rgba(255,255,255,0.95)",
+            border: "1px solid rgba(0,0,0,0.1)",
+            borderRadius: "8px",
+            padding: "12px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          }}
+        >
+          <p style={{ color: "#111", fontWeight: 600, marginBottom: "8px" }}>
+            {label}
+          </p>
+          {payload.map((entry: any, index: number) => (
+            <p
+              key={index}
+              style={{
+                color: entry.color,
+                margin: "4px 0",
+                fontSize: "14px",
+              }}
+            >
+              {entry.name}: {entry.value}
+              {unitSymbol}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart
@@ -40,24 +80,16 @@ const DailyChart = ({ dailyTempData }: DailyChartProps) => {
           stroke="rgba(0,0,0,0.6)"
           tick={{ fill: "rgba(0,0,0,0.8)" }}
           className="dark:stroke-[rgba(255,255,255,0.6)] dark:**:fill-[rgba(255,255,255,0.8)]"
+          label={{
+            value: unitSymbol,
+            angle: -90,
+            position: "insideLeft",
+            style: { fill: "rgba(0,0,0,0.8)" },
+            className: "dark:fill-[rgba(255,255,255,0.8)]",
+          }}
         />
         <Tooltip
-          contentStyle={{
-            backgroundColor: "rgba(255,255,255,0.95)",
-            border: "1px solid rgba(0,0,0,0.1)",
-            borderRadius: "8px",
-            color: "#111",
-          }}
-          labelStyle={{
-            color: "#111",
-            fontWeight: 600,
-          }}
-          itemStyle={{
-            color: "#111",
-          }}
-          wrapperStyle={{
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          }}
+          content={<CustomTooltip />}
           cursor={{ stroke: "rgba(0,0,0,0.2)", strokeWidth: 1 }}
         />
         <defs>
@@ -73,7 +105,7 @@ const DailyChart = ({ dailyTempData }: DailyChartProps) => {
           stroke="#f97316"
           fill="url(#colorTemp)"
           strokeWidth={2}
-          name="Max Temp (°C)"
+          name={`Max Temp`}
         />
         <Line
           type="monotone"
@@ -81,7 +113,7 @@ const DailyChart = ({ dailyTempData }: DailyChartProps) => {
           stroke="#22c55e"
           strokeWidth={2}
           dot={{ fill: "#22c55e", r: 3 }}
-          name="Avg Temp (°C)"
+          name={`Avg Temp`}
         />
         <Line
           type="monotone"
@@ -89,7 +121,7 @@ const DailyChart = ({ dailyTempData }: DailyChartProps) => {
           stroke="#60a5fa"
           strokeWidth={2}
           dot={{ fill: "#60a5fa", r: 4 }}
-          name="Min Temp (°C)"
+          name={`Min Temp`}
         />
       </AreaChart>
     </ResponsiveContainer>

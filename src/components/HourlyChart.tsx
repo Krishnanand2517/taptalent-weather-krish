@@ -7,6 +7,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type { TemperatureUnit } from "../types";
 
 interface HourlyChartProps {
   hourlyChartData: {
@@ -15,9 +16,12 @@ interface HourlyChartProps {
     feelsLike: number;
     pop: number;
   }[];
+  unit: TemperatureUnit;
 }
 
-const HourlyChart = ({ hourlyChartData }: HourlyChartProps) => {
+const HourlyChart = ({ hourlyChartData, unit }: HourlyChartProps) => {
+  const unitSymbol = unit === "celsius" ? "°C" : "°F";
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart
@@ -50,6 +54,16 @@ const HourlyChart = ({ hourlyChartData }: HourlyChartProps) => {
             fontSize: 12,
             className: "dark:fill-[rgba(255,255,255,0.8)]",
           }}
+          label={{
+            value: unitSymbol,
+            angle: -90,
+            position: "insideLeft",
+            style: {
+              fill: "rgba(0,0,0,0.7)",
+              fontSize: 12,
+            },
+            className: "dark:fill-[rgba(255,255,255,0.8)]",
+          }}
         />
 
         <Tooltip
@@ -70,6 +84,7 @@ const HourlyChart = ({ hourlyChartData }: HourlyChartProps) => {
             boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
           }}
           cursor={{ stroke: "rgba(0,0,0,0.2)", strokeWidth: 1 }}
+          formatter={(value: number) => [`${value}${unitSymbol}`, ""]}
         />
 
         <Line
@@ -78,7 +93,7 @@ const HourlyChart = ({ hourlyChartData }: HourlyChartProps) => {
           stroke="#f59e0b"
           strokeWidth={3}
           dot={{ fill: "#f59e0b", r: 4 }}
-          name="Temperature (°C)"
+          name={`Temperature (${unitSymbol})`}
         />
         <Line
           type="monotone"
@@ -87,7 +102,7 @@ const HourlyChart = ({ hourlyChartData }: HourlyChartProps) => {
           strokeWidth={2}
           strokeDasharray="5 5"
           dot={false}
-          name="Feels Like (°C)"
+          name={`Feels Like (${unitSymbol})`}
         />
       </LineChart>
     </ResponsiveContainer>

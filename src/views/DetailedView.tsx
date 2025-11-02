@@ -21,6 +21,7 @@ import {
   selectDetailedWeather,
   selectDetailedWeatherLoading,
   selectIsFavorite,
+  selectTemperatureUnit,
 } from "../selectors";
 import {
   formatDate,
@@ -28,6 +29,7 @@ import {
   getRelativeTime,
 } from "../utils/timeFormatting";
 import { getCardBg } from "../utils/colors";
+import { getTemperatureDisplay } from "../utils/tempConversion";
 import AlertBox from "../components/AlertBox";
 import DetailsGrid from "../components/DetailsGrid";
 import SunTimings from "../components/SunTimings";
@@ -48,7 +50,7 @@ const DetailedView = () => {
   const currentCity = useAppSelector((state) => state.currentCity.city);
   const detailedWeather = useAppSelector(selectDetailedWeather);
   const loading = useAppSelector(selectDetailedWeatherLoading);
-  // const favoriteCities = useAppSelector(selectFavoriteCities);
+  const unit = useAppSelector(selectTemperatureUnit);
 
   const isPinned = useAppSelector((state) =>
     currentCity ? selectIsFavorite(currentCity.id)(state) : false
@@ -88,8 +90,6 @@ const DetailedView = () => {
     dispatch(setCurrentCity(null));
     navigate("/");
   };
-
-  if (!currentCity) return;
 
   const handleTogglePin = () => {
     if (!currentCity) return;
@@ -132,26 +132,29 @@ const DetailedView = () => {
 
   const condition = weather[0].main ?? "Unknown";
   const icon = weather[0].icon ?? "";
-  const temperature = Math.round(current.temp);
-  const feelsLike = Math.round(current.feels_like);
-  const dewPoint = Math.round(current.dew_point);
+
+  // Convert temperatures based on selected unit
+  const temperature = getTemperatureDisplay(current.temp, unit);
+  const feelsLike = getTemperatureDisplay(current.feels_like, unit);
+  const dewPoint = getTemperatureDisplay(current.dew_point, unit);
+
   const lastUpdated = getRelativeTime(dt);
   const isNight = icon.endsWith("n");
 
   const hourlyChartData =
     hourly?.slice(0, 12).map((h) => ({
       time: formatTime(h.dt),
-      temp: Math.round(h.temp),
-      feelsLike: Math.round(h.feels_like),
+      temp: getTemperatureDisplay(h.temp, unit).value,
+      feelsLike: getTemperatureDisplay(h.feels_like, unit).value,
       pop: Math.round(h.pop * 100),
     })) || [];
 
   const dailyTempData =
     daily?.map((day) => ({
       date: formatDate(day.dt),
-      max: Math.round(day.temp.max),
-      min: Math.round(day.temp.min),
-      avg: Math.round((day.temp.max + day.temp.min) / 2),
+      max: getTemperatureDisplay(day.temp.max, unit).value,
+      min: getTemperatureDisplay(day.temp.min, unit).value,
+      avg: getTemperatureDisplay((day.temp.max + day.temp.min) / 2, unit).value,
     })) || [];
 
   const windData =
@@ -190,7 +193,7 @@ const DetailedView = () => {
                 <IconCloud className="w-20 h-20 text-neutral-800 dark:text-white" />
                 <div>
                   <div className="text-7xl font-bold text-neutral-800 dark:text-white">
-                    {temperature}°
+                    {temperature.value}°
                   </div>
                   <p className="text-2xl text-gray-700 dark:text-blue-100 capitalize mt-2">
                     {current.weather[0].description}
@@ -198,7 +201,7 @@ const DetailedView = () => {
                 </div>
               </div>
               <div className="text-neutral-900 dark:text-white/80 text-lg">
-                Feels like {feelsLike}°
+                Feels like {feelsLike.formatted}
               </div>
 
               <button
@@ -224,8 +227,9 @@ const DetailedView = () => {
               humidity={current.humidity}
               visibility={current.visibility}
               pressure={current.pressure}
-              dewPoint={dewPoint}
+              dewPoint={dewPoint.value}
               uvi={current.uvi}
+              unit={unit}
             />
           </div>
 
@@ -244,9 +248,9 @@ const DetailedView = () => {
               12-Hour Forecast
             </h2>
             <div className="h-64">
-              <HourlyChart hourlyChartData={hourlyChartData} />
+              <HourlyChart hourlyChartData={hourlyChartData} unit={unit} />
             </div>
-            <HourlyScroll hourly={hourly} />
+            <HourlyScroll hourly={hourly} unit={unit} />
           </div>
 
           {/* Precipitation Chart */}
@@ -292,7 +296,7 @@ const DetailedView = () => {
               Daily Temperature
             </h2>
             <div className="h-64">
-              <DailyChart dailyTempData={dailyTempData} />
+              <DailyChart dailyTempData={dailyTempData} unit={unit} />
             </div>
           </div>
 
@@ -310,7 +314,7 @@ const DetailedView = () => {
                     key={idx}
                     className="bg-neutral-900/10 dark:bg-white/10 backdrop-blur-sm border border-neutral-900/20 dark:border-white/20 rounded-xl p-4 hover:bg-neutral-900/20 dark:hover:bg-white/20 transition-all duration-300"
                   >
-                    <DailyPrediction day={day} idx={idx} />
+                    <DailyPrediction day={day} idx={idx} unit={unit} />
                   </div>
                 );
               })}

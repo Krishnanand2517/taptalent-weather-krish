@@ -4,7 +4,8 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import type { WeatherData } from "../types";
-import { mockWeatherDataDetailed } from "../data/mockData";
+
+const API_KEY = import.meta.env.VITE_OWM_KEY;
 
 interface DetailedWeatherState {
   data: WeatherData | null;
@@ -33,16 +34,15 @@ export const fetchDetailedWeather = createAsyncThunk<
   "detailedWeather/fetchDetailedWeather",
   async ({ lat, lon }, { rejectWithValue }) => {
     try {
-      //   const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=YOUR_API_KEY&units=metric`;
+      const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
 
-      //   const response = await fetch(url);
+      const response = await fetch(url);
 
-      //   if (!response.ok) {
-      //     throw new Error("Failed to fetch detailed weather data");
-      //   }
+      if (!response.ok) {
+        throw new Error("Failed to fetch detailed weather data");
+      }
 
-      //   const data: WeatherData = await response.json();
-      const data: WeatherData = mockWeatherDataDetailed[0];
+      const data: WeatherData = await response.json();
       return data;
     } catch (error) {
       return rejectWithValue(

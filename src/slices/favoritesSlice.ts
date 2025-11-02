@@ -3,18 +3,7 @@ import {
   createSlice,
   type PayloadAction,
 } from "@reduxjs/toolkit";
-import type { CityData, FavoriteCity } from "../types";
-import { mockWeatherData } from "../data/mockData";
-
-const firstCityData: CityData = mockWeatherData[0];
-
-const initialFavorite: FavoriteCity = {
-  id: firstCityData.id,
-  name: firstCityData.name,
-  country: firstCityData.sys.country,
-  lat: firstCityData.coord.lat,
-  lon: firstCityData.coord.lon,
-};
+import type { FavoriteCity } from "../types";
 
 interface FavoritesState {
   cities: FavoriteCity[];
@@ -29,8 +18,7 @@ const favoritesAPI = {
     await new Promise((resolve) => setTimeout(resolve, 100));
     try {
       const stored = localStorage.getItem("favoriteCities");
-      // return stored ? JSON.parse(stored) : [];
-      return [initialFavorite];
+      return stored ? JSON.parse(stored) : [];
     } catch (error) {
       console.error("Failed to load favorites:", error);
       return [];
