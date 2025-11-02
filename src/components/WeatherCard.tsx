@@ -4,7 +4,7 @@ import { IconDroplets, IconClock } from "@tabler/icons-react";
 import type { CityData } from "../types";
 import WeatherIcon from "./WeatherIcon";
 import { getCardBg } from "../utils/colors";
-import { getRelativeTime } from "../utils/relativeTime";
+import { getRelativeTime } from "../utils/timeFormatting";
 
 interface WeatherCardProps {
   cityData: CityData;

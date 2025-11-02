@@ -1,3 +1,19 @@
+export const formatTime = (timestamp: number) => {
+  return new Date(timestamp * 1000).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
+export const formatDate = (timestamp: number) => {
+  return new Date(timestamp * 1000).toLocaleDateString([], {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+};
+
 // Convert timestamp to relative time (e.g., "2m ago")
 export const getRelativeTime = (timestamp: number): string => {
   const now = Date.now();
