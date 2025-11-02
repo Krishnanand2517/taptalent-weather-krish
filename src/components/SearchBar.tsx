@@ -68,8 +68,7 @@ const SearchBar = () => {
     try {
       setIsFetchingWeather(true);
       setError("");
-
-      setQuery(city.name);
+      setQuery("");
       setSuggestions([]);
 
       const weatherResult = await dispatch(

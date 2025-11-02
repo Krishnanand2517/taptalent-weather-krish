@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   IconArrowLeft,
@@ -55,6 +55,20 @@ const DetailedView = () => {
   const isPinned = useAppSelector((state) =>
     currentCity ? selectIsFavorite(currentCity.id)(state) : false
   );
+
+  const [lastUpdated, setLastUpdated] = useState(() =>
+    currentCity ? getRelativeTime(currentCity.dt) : ""
+  );
+
+  useEffect(() => {
+    if (!currentCity) return;
+
+    const interval = setInterval(() => {
+      setLastUpdated(getRelativeTime(currentCity.dt));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [currentCity]);
 
   useEffect(() => {
     if (currentCity) {
@@ -127,7 +141,7 @@ const DetailedView = () => {
     );
   }
 
-  const { weather, dt } = currentCity;
+  const { weather } = currentCity;
   const { current, hourly, daily, alerts } = detailedWeather;
 
   const condition = weather[0].main ?? "Unknown";
@@ -138,7 +152,6 @@ const DetailedView = () => {
   const feelsLike = getTemperatureDisplay(current.feels_like, unit);
   const dewPoint = getTemperatureDisplay(current.dew_point, unit);
 
-  const lastUpdated = getRelativeTime(dt);
   const isNight = icon.endsWith("n");
 
   const hourlyChartData =

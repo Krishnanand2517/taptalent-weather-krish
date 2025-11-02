@@ -8,6 +8,7 @@ import { getRelativeTime } from "../utils/timeFormatting";
 import { useAppDispatch } from "../hooks/reduxHooks";
 import { setCurrentCity } from "../slices/currentCitySlice";
 import { getTemperatureDisplay } from "../utils/tempConversion";
+import { useEffect, useState } from "react";
 
 interface WeatherCardProps {
   cityData: CityData;
@@ -25,10 +26,23 @@ const WeatherCard = ({ cityData, unit }: WeatherCardProps) => {
     dt,
   } = cityData;
 
+  const [lastUpdated, setLastUpdated] = useState(() =>
+    dt ? getRelativeTime(dt) : ""
+  );
+
+  useEffect(() => {
+    if (!cityData) return;
+
+    const interval = setInterval(() => {
+      setLastUpdated(getRelativeTime(dt));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [cityData, dt]);
+
   const condition = weather[0].main ?? "Unknown";
   const icon = weather[0].icon ?? "";
   const isNight = icon.endsWith("n");
-  const lastUpdated = getRelativeTime(dt);
 
   const { value, symbol } = getTemperatureDisplay(temp, unit);
 
