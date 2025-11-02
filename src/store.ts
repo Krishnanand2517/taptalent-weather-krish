@@ -3,6 +3,7 @@ import weatherReducer from "./slices/weatherSlice";
 import detailedWeatherReducer from "./slices/detailedWeatherSlice";
 import favoritesReducer from "./slices/favoritesSlice";
 import settingsReducer from "./slices/settingsSlice";
+import currentCityReducer from "./slices/currentCitySlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     detailedWeather: detailedWeatherReducer,
     favorites: favoritesReducer,
     settings: settingsReducer,
+    currentCity: currentCityReducer,
   },
 });
 

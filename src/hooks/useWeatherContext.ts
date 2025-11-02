@@ -1,10 +1,10 @@
 import { useOutletContext } from "react-router-dom";
 
-import type { CityData } from "../types";
+import type { CityData, FavoriteCity } from "../types";
 
 type WeatherContextType = {
-  weatherData: CityData[];
-  currentCity: CityData;
+  currentCity: CityData | null;
+  favoriteCities: FavoriteCity[];
 };
 
 export const useWeatherContext = () => {

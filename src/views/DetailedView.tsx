@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   IconArrowLeft,
@@ -11,13 +11,22 @@ import {
   IconWind,
 } from "@tabler/icons-react";
 
-import { useWeatherContext } from "../hooks/useWeatherContext";
+import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
+import { fetchDetailedWeather } from "../slices/detailedWeatherSlice";
+import {
+  addFavoriteAsync,
+  removeFavoriteAsync,
+} from "../slices/favoritesSlice";
+import {
+  selectDetailedWeather,
+  selectDetailedWeatherLoading,
+  selectIsFavorite,
+} from "../selectors";
 import {
   formatDate,
   formatTime,
   getRelativeTime,
 } from "../utils/timeFormatting";
-import { mockWeatherDataDetailed } from "../data/mockData";
 import { getCardBg } from "../utils/colors";
 import AlertBox from "../components/AlertBox";
 import DetailsGrid from "../components/DetailsGrid";
@@ -30,48 +39,119 @@ import WindChart from "../components/WindChart";
 import { getWindDirection } from "../utils/windDirection";
 import WindCompass from "../components/WindCompass";
 import DailyPrediction from "../components/DailyPrediction";
+import { setCurrentCity } from "../slices/currentCitySlice";
 
 const DetailedView = () => {
-  const [isPinned, setIsPinned] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const { currentCity } = useWeatherContext();
+  const currentCity = useAppSelector((state) => state.currentCity.city);
+  const detailedWeather = useAppSelector(selectDetailedWeather);
+  const loading = useAppSelector(selectDetailedWeatherLoading);
+  // const favoriteCities = useAppSelector(selectFavoriteCities);
 
-  const {
-    weather,
-    dt,
-    coord: { lat, lon },
-  } = currentCity;
+  const isPinned = useAppSelector((state) =>
+    currentCity ? selectIsFavorite(currentCity.id)(state) : false
+  );
 
-  const cityDetails =
-    mockWeatherDataDetailed.find(
-      (city) => city.lon === lon && city.lat === lat
-    ) ?? mockWeatherDataDetailed[0];
+  useEffect(() => {
+    if (currentCity) {
+      dispatch(
+        fetchDetailedWeather({
+          lat: currentCity.coord.lat,
+          lon: currentCity.coord.lon,
+        })
+      );
 
-  const { current, hourly, daily, alerts } = cityDetails;
+      // Set up polling for detailed weather (every 1 minute)
+      const interval = setInterval(() => {
+        dispatch(
+          fetchDetailedWeather({
+            lat: currentCity.coord.lat,
+            lon: currentCity.coord.lon,
+          })
+        );
+      }, 60000);
+
+      return () => clearInterval(interval);
+    }
+  }, [currentCity, dispatch]);
+
+  // Clear current city when component unmounts (navigating back)
+  useEffect(() => {
+    return () => {
+      dispatch(setCurrentCity(null));
+    };
+  }, [dispatch]);
+
+  const handleBackNavigation = () => {
+    dispatch(setCurrentCity(null));
+    navigate("/");
+  };
+
+  if (!currentCity) return;
+
+  const handleTogglePin = () => {
+    if (!currentCity) return;
+
+    if (isPinned) {
+      dispatch(removeFavoriteAsync(currentCity.id));
+    } else {
+      dispatch(
+        addFavoriteAsync({
+          id: currentCity.id,
+          name: currentCity.name,
+          country: currentCity.sys.country,
+          lat: currentCity.coord.lat,
+          lon: currentCity.coord.lon,
+        })
+      );
+    }
+  };
+
+  if (!currentCity) {
+    navigate("/");
+    return null;
+  }
+
+  if (loading || !detailedWeather) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-gray-900 dark:border-white mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading detailed weather...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const { weather, dt } = currentCity;
+  const { current, hourly, daily, alerts } = detailedWeather;
 
   const condition = weather[0].main ?? "Unknown";
   const icon = weather[0].icon ?? "";
-  const temperature = Math.round(current.temp - 273.15);
-  const feelsLike = Math.round(current.feels_like - 273.15);
-  const dewPoint = Math.round(current.dew_point - 273.15);
+  const temperature = Math.round(current.temp);
+  const feelsLike = Math.round(current.feels_like);
+  const dewPoint = Math.round(current.dew_point);
   const lastUpdated = getRelativeTime(dt);
   const isNight = icon.endsWith("n");
 
   const hourlyChartData =
     hourly?.slice(0, 12).map((h) => ({
       time: formatTime(h.dt),
-      temp: Math.round(h.temp - 273.15),
-      feelsLike: Math.round(h.feels_like - 273.15),
+      temp: Math.round(h.temp),
+      feelsLike: Math.round(h.feels_like),
       pop: Math.round(h.pop * 100),
     })) || [];
 
   const dailyTempData =
     daily?.map((day) => ({
       date: formatDate(day.dt),
-      max: Math.round(day.temp.max - 273.15),
-      min: Math.round(day.temp.min - 273.15),
-      avg: Math.round((day.temp.max + day.temp.min) / 2 - 273.15),
+      max: Math.round(day.temp.max),
+      min: Math.round(day.temp.min),
+      avg: Math.round((day.temp.max + day.temp.min) / 2),
     })) || [];
 
   const windData =
@@ -86,7 +166,7 @@ const DetailedView = () => {
     <div>
       <div className="mb-6">
         <button
-          onClick={() => navigate("/")}
+          onClick={handleBackNavigation}
           className="flex items-center space-x-1 text-sm cursor-pointer transition-colors text-gray-500 hover:text-gray-700 dark:text-gray-100 dark:hover:text-gray-300"
         >
           <IconArrowLeft className="w-4 h-4" />
@@ -122,7 +202,7 @@ const DetailedView = () => {
               </div>
 
               <button
-                onClick={() => setIsPinned(!isPinned)}
+                onClick={handleTogglePin}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-300 ${
                   isPinned
                     ? "bg-yellow-400 text-gray-900 hover:bg-yellow-300 shadow-lg shadow-yellow-400/50"

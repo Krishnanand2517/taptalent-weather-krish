@@ -5,14 +5,17 @@ import type { CityData } from "../types";
 import WeatherIcon from "./WeatherIcon";
 import { getCardBg } from "../utils/colors";
 import { getRelativeTime } from "../utils/timeFormatting";
+import { useAppDispatch } from "../hooks/reduxHooks";
+import { setCurrentCity } from "../slices/currentCitySlice";
 
 interface WeatherCardProps {
   cityData: CityData;
 }
 
 const WeatherCard = ({ cityData }: WeatherCardProps) => {
+  const dispatch = useAppDispatch();
+
   const {
-    id,
     name,
     main: { temp, humidity },
     weather,
@@ -27,9 +30,14 @@ const WeatherCard = ({ cityData }: WeatherCardProps) => {
 
   const navigate = useNavigate();
 
+  const handleClick = () => {
+    dispatch(setCurrentCity(cityData));
+    navigate(`/city-${cityData.id}`);
+  };
+
   return (
     <div
-      onClick={() => navigate(`/city-${id}`)}
+      onClick={handleClick}
       className={`bg-linear-to-br ${getCardBg(condition, isNight)}
                  p-6 md:px-12 rounded-2xl shadow-lg 
                  transition-all duration-300 ease-in-out cursor-pointer
